@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>國中會考倒數計時器</title>
+    <style>
+        /* 清新風格設計 */
+        :root {
+            --primary-green: #eef7f2;
+            --accent-green: #78c2ad;
+            --text-dark: #3a5a40;
+            --white: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e0f2f1 0%, #f1f8e9 100%);
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            color: var(--text-dark);
+        }
+
+        /* 巨大標題 */
+        h1 {
+            font-size: 6rem; /* 極大字體 */
+            margin-bottom: 10px;
+            color: var(--text-dark);
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.05);
+            font-weight: 900;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        /* 日曆修改區域 */
+        .config-area {
+            margin-bottom: 50px;
+            background: var(--white);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        label { font-weight: bold; margin-right: 10px; }
+        input[type="date"] {
+            border: none;
+            background: transparent;
+            font-size: 1.2rem;
+            color: var(--accent-green);
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* 倒數計時器主體 */
+        .timer-container {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .time-card {
+            background: var(--white);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 25px;
+            min-width: 160px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .time-card:hover {
+            transform: translateY(-10px);
+        }
+
+        /* 數字樣式 */
+        .number {
+            font-size: 5.5rem; /* 數字超大 */
+            font-weight: 800;
+            display: block;
+            line-height: 1;
+            color: var(--accent-green);
+            font-variant-numeric: tabular-nums; /* 防止數字切換時抖動 */
+        }
+
+        .label {
+            font-size: 1.4rem;
+            margin-top: 10px;
+            display: block;
+            color: #88a096;
+            letter-spacing: 2px;
+        }
+
+        /* 秒數特別顯眼 */
+        #seconds {
+            color: #ff8a80; /* 秒數給一點溫暖的對比色 */
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .number { font-size: 3rem; }
+            .time-card { min-width: 100px; padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>會考倒數計時</h1>
+    <div class="subtitle">堅持到底，就是勝利！</div>
+
+    <div class="config-area">
+        <label>目標考試日期：</label>
+        <input type="date" id="targetDate" value="2026-05-16">
+    </div>
+
+    <div class="timer-container">
+        <div class="time-card">
+            <span class="number" id="days">00</span>
+            <span class="label">DAYS 天</span>
+        </div>
+        <div class="time-card">
+            <span class="number" id="hours">00</span>
+            <span class="label">HOURS 時</span>
+        </div>
+        <div class="time-card">
+            <span class="number" id="minutes">00</span>
+            <span class="label">MINS 分</span>
+        </div>
+        <div class="time-card">
+            <span class="number" id="seconds">00</span>
+            <span class="label">SECS 秒</span>
+        </div>
+    </div>
+
+    <script>
+        function updateTimer() {
+            const targetInput = document.getElementById('targetDate').value;
+            const targetTime = new Date(targetInput + "T09:00:00").getTime(); // 假設早上9點開考
+            const now = new Date().getTime();
+            const diff = targetTime - now;
+
+            if (diff <= 0) {
+                document.querySelectorAll('.number').forEach(el => el.innerText = "00");
+                return;
+            }
+
+            // 時間換算
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            // 寫入網頁並補 0
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+
+        // 每 1 秒執行一次 (1000 毫秒)
+        setInterval(updateTimer, 1000);
+        
+        // 初始執行一次防止白畫面
+        updateTimer();
+
+        // 當日期變更時立即更新
+        document.getElementById('targetDate').addEventListener('change', updateTimer);
+    </script>
+
+</body>
+</html>
